@@ -1,0 +1,25 @@
+#system/software related
+.DS_Store
+.vscode
+.ipynb_checkpoints
+
+#latex related
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cpt
+*.cb2
+.*.lb
+*.fdb_latexmk
+*.synctex.gz
+*.pygstyle
+*.pygtex
+
+*_minted*
