@@ -109,7 +109,7 @@ eros, et gravida lorem. Maecenas vel varius neque. Aliquam.
 
 Code example : 
 \begin{minted}[breaklines]{ocaml}
-    type 'a t = { name : string; mutable info : 'a};;
+    type t = {name : string ; mutable info : int};
     let p = { name = "John"; info = 23 };;
     let double_quote = ""
     let broken_highlight = ()
