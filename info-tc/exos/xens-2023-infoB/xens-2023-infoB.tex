@@ -1,26 +1,36 @@
 \documentclass{article}
 
-% pacakages
-\usepackage[french]{babel}
-\usepackage{caption}
-\usepackage[T1]{fontenc}
-\usepackage{amsmath, amsfonts, amssymb, mathrsfs}
-\usepackage{stmaryrd}
-\usepackage{fancyhdr}
-\usepackage{lastpage}
-\usepackage{lipsum}
-\usepackage{graphicx}
-\usepackage[ddmmyyyy]{datetime}
-\usepackage{adjustbox}
-\usepackage[a4paper, portrait, margin=21mm]{geometry} % define the page format
-\usepackage[explicit]{titlesec}
-\usepackage{color, soul}
-\usepackage{cprotect}
-\usepackage{ulem}
-\setulcolor{red}
+% PACKAGES
+% essentials
+\usepackage[french, english]{babel} % specific language formatting
+\usepackage[T1]{fontenc} % characters encoding
+\usepackage{caption} % captions for graphics, images, ...
 
-%reference for the items of 'enumerate'
+% page formatting
+\usepackage[a4paper, portrait, margin=20mm]{geometry} % define the page format
+\usepackage[explicit]{titlesec} % formatting and styling of section titles ... 
+% ... and headers
+\usepackage{fancyhdr} % customize headers and footers
+\usepackage{lastpage} % keeps track of the number of last page
+\usepackage{graphicx} % image, figures and graphics insertion
+\usepackage[ddmmyyyy]{datetime} % display the date and time of saving
+\usepackage{adjustbox} % scaling, resizing graphics
+\usepackage{color, soul} % text formatting (highlight, underline, ...)
+\setulcolor{red}
 \usepackage{enumitem, hyperref}
+
+% math notation
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{stmaryrd}
+
+% code formatting
+\usepackage[outputdir=.aux]{minted}
+\usemintedstyle{emacs}
+
+%------------------------------------------------------------------------------
+
+% COMMANDS AND PERSONALIZATION
+% references for items in 'enumerate'
 \makeatletter
 \def\namedlabel#1#2{\begingroup
     #2%
@@ -29,54 +39,65 @@
 }
 \makeatother
 
-%personalized section style
+% personalized section style
 \titleformat{\section}
 {\Large\bfseries}
 {\thesection}{1em}{\ul{#1}}
 
-%personalized enumerate style
-\renewcommand{\labelenumii}{\alph{enumii})}
+% personalized 'question' list (mainly for test)
+\newlist{question}{enumerate}{2}
+\setlist[question, 1]
+{label=\bfseries{Question \arabic{questioni}.},
+wide=\parindent,
+resume
+}
+\setlist[question, 2]
+{label=(\alph{questionii}),
+leftmargin=\parindent
+}
 
-%code formatting
-\usepackage[outputdir=.aux]{minted}
-\usemintedstyle{manni}
-
-%divers commands
+% math commands
 \newcommand{\bb}[1]{\mathbb{#1}}
-\newcommand{\encadrer}[1]{\fbox{
-    \begin{minipage}[t]{0.9\textwidth}
+
+% framing text
+\newcommand{\encadrer}[1]{\fbox{color=red
+    \begin{minipage}{0.90\textwidth}
         #1
     \end{minipage}
 }}
-% \renewcommand{\thesection}{\Roman{section}} % Roman numerals for sections
 
+% \renewcommand{\thesection}{\Roman{section}} % Roman numerals for sections
 \setlength{\headheight}{12.5pt}
 
 \graphicspath{ {./img/} } % define path to img 
-\newcommand{\image}[4]{ %command to insert image
+
+% insert image command
+\newcommand{\image}[3]{
     \begin{minipage}[t]{\linewidth}
         #1
         \adjustbox{valign=t}{
             \includegraphics[width=#2\linewidth]{#3}
         }
-        \captionof*{figure}{#4}
     \end{minipage}}
 
-%page numerotation
+% page numbering
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
 \fancyfoot[R]{\thepage/\pageref{LastPage}}
 
-%document info
+%------------------------------------------------------------------------------
+
+% DOCUMENT
+% document info
 \makeatletter
-\title{DM2 - E3A MP 2019}
+\title{X-ENS 2023 : Informatique B}
 \date{\today}
-\newcommand{\matiere}{Informatique Option}
-\newcommand{\classe}{MP\textsuperscript{*} }
+\newcommand{\matiere}{Informatique Tronc Commun}
+\newcommand{\classe}{MP\textsuperscript{*}}
 \author{Arsène MALLET}
 
-%header
+% header
 \fancypagestyle{firstpage}{
     \fancyhead[L]{\@author}
     \fancyhead[C]{\classe - \matiere}
@@ -92,340 +113,51 @@
     \huge\bfseries{\@title}
 \end{center}
 
-\section{Autour de la recherche par dichotomie}
+\section{Différentiels par positions fixes}
 
-\subsection{Question de cours}
+\begin{question}
+    \item
+    \begin{minted}[breaklines, autogobble]{python3}
+    def textes_egaux(texte1, texte2):
+        for i in range(len(texte1)):
+            if texte1[i] != texte2[i]:
+                return False
+        return True
+    \end{minted}
 
-\begin{enumerate}
-    \item La recherche par dichotomie est un algorithme de recherche fonctionnant sur une liste d'entiers \textbf{triée}.
-    \encadrer{
-    Le principe de cet algorithme consiste en la comparaison de l'élément recherché avec l'élément du milieu de la liste afin de savoir dans quel moitié de la liste chercher.} \\
-    En procédant ainsi récursivement sur les moitiés désirées, cet algorithme à l'avantage d'avoir une \\ 
-    \fbox{complexité en $O(\ln n)$} où $n \in \bb{N}$ est la taille de la liste.
-    
-    \item La recherche dichotomique nécessite que la liste soit triée, ce qui implique l'existence d'une relation d'ordre entre les éléments de la liste. Or il existe bien une relation d'ordre total pour les couples d'entiers et les chaines de caractères (\textit{ordre lexicographique}). \fbox{La recherche par dichotomie est donc possible}.
-\end{enumerate}
+    La complexité de \verb|textes_egaux| est en $O(n)$, où $n$ est la
+    longueur des textes.
 
-\subsection{\'Etude d'une fonction dicho}
-
-\begin{enumerate}
-    \setcounter{enumi}{2}
-
-    \item \cprotect\encadrer{Si on remplace la précondition de la ligne $(3)$ par un appel à une fonction qui trierait la liste \verb|liste| dans l'ordre croissant, alors soit ce tri modifierait directement la liste \verb|liste|, ce qui menerait à des effets de bords, conséquence qui peut ne pas être souhaitable en fonction des besoins, soit l'on devra effectuer une copie de \verb|liste|, et une complexité spatiale linéaire en la taille de la liste en résulterait, ce qui n'est pas souhaitable avec un algorithme de complexité temporelle logarithmique.}
-    
-    \item \label{itm:correctionDicho} Soit $n \in \bb{N}$ la taille de la liste \verb|liste|. Notons $\mathscr{P}_t$ le prédicat : \og l'entier \verb|x| apparaît dans la sous-liste \verb|liste[g:d+1]| en entrant dans le $t$-ème tour de boucle \verb|while| \fg. Montrons par récurrence que $\mathscr{P}_1 = \mathscr{P}_t$ pour tout $t \in \bb{N^*}$ : \\
-    \underline{Initialisation} : si $t = 1$ (i.e.\ qu'on entre pour la première fois dans la boucle) alors on a évidemment $\mathscr{P}_1 = \mathscr{P}_t$ \\
-    \underline{Hérédité} : Soit $t \in \bb{N^*}$, supposons $\mathscr{P}_1 = \mathscr{P}_t$, montrons que $\mathscr{P}_1 = \mathscr{P}_{t + 1}$ :
-    En entrant dans le $t$-ème tour de boucle :
-    \begin{itemize}
-        \item Soit $\mathscr{P}_1 = \mathscr{P}_t$ (hypothèse de récurrence) est vrai, et dans ce cas, pendant le $t$-ème tour de boucle : 
-            \begin{itemize}
-                \item Si \verb|x| appartient à la moitié haute de la liste, alors au $(t + 1)$-ème tour de boucle, \verb|liste[g, d + 1]| est égale à la moitié haute de la liste, donc $\mathscr{P}_{t + 1}$ est vrai et donc $\mathscr{P}_1 = \mathscr{P}_{t + 1}$.
-
-                \item Sinon, \verb|x| appartient à la moitié basse, et au tour de boucle $(t + 1)$, \verb|liste[g, d + 1]| est égale à la moitié basse de la liste, donc $\mathscr{P}_{t + 1}$ est vrai et donc $\mathscr{P}_1 = \mathscr{P}_{t + 1}$.
-            \end{itemize}
-
-        \item Sinon, $\mathscr{P}_1$ est faux, et donc \verb|x| n'apparait pas dans \verb|liste|, et n'apparaitra donc jamais dans une sous-liste de \verb|liste|. Ainsi $\mathscr{P}_1 = \mathscr{P}_t = \mathscr{P}_{t + 1}$
-    \end{itemize}
-    \cprotect\encadrer{On peut donc conclure que $\forall t \in \bb{N^*}, \; \mathscr{P}_1 = \mathscr{P}_t$, ce qui montre que $\mathscr{P}$ est préservé à chaque tour de la boucle \verb|while|}.
-
-    \item En prenant trois entiers $a < b < c \in \bb{Z}$, alors \cprotect\fbox{l'appel \verb|dicho([a, c], b]| ne terminera pas}.
-    
-    \item \begin{minted}[escapeinside=||, frame=single]{python}
-    def dicho(liste,x):
-        # Pré-conditions: x est un entier, liste est une
-        # liste d’entiers triée dans l’ordre croissant
-        n = len(liste)
-        if n == 0:
-            return False
-        g, d = 0, n - 1
-        while d-g > 0
-            m = (g+d)//2
-            if liste[m] >= x:
-                d = m
-            else:
-                |\xout{g = m} $\rightarrow$ \colorbox{green}{g = m + 1}|
-        return liste[g] == x
+    \item
+    \begin{minted}[breaklines, autogobble]{python3}
+        def distance(texte1, texte2):
+        count = 0
+            for i in range(len(texte1)):
+                if texte1[i] != texte2[i]:
+                    count += 1
+            return count
         \end{minted}
-
-    \item \begin{itemize}
-        \item \underline{Terminaison}: \\
-        Montrons que la fonction termine, pour cela, montrons que la suite $(d-g)_{t \in \bb{N^*}}$ (la suite des valeurs de \verb|d-g| en rentrant de le $t$-ème tour de boucle) est strictement décroissante : \\
-        Soit $t \in \bb{N^*}$ tel que la boucle effectue le tour $t$ (i.e.\ $(d - g)_t > 0$):
-            \begin{itemize}
-                \item Si \verb|liste[m] >= x|, \verb|d| devient \verb|m| et \verb|m - g| $ = (d-g)_{t + 1} = \lfloor \frac{g + d}{2} \rfloor - g \leq \frac{g + d}{2} - g \leq \frac{d - g}{2} < (d - g)_t$
-
-                \item Sinon, \verb|g| devient \verb|m + 1|, et \verb|d - (m + 1)| $ = (d - g)_{t + 1} < d - \frac{g + d}{2} < \frac{d - g}{2} < (d - g)_t$
-            \end{itemize}
-        \fbox{D'où la décroissance stricte et donc la terminaison}.
-
-        \item \underline{Correction}: \\
-        De la même manière qu'à la question \ref{itm:correctionDicho} on montre que $\mathscr{P}$ est préservé à chaque tour de la boucle \verb|while| de \verb|dicho| corrigée, \fbox{ce qui montre la correction}.
-    \end{itemize}
-\end{enumerate}
-
-\subsection{Extensions du principe}
-
-\begin{enumerate}
-    \setcounter{enumi}{7}
-
-    \item \begin{minted}[breaklines, frame=single]{python}
-    def tricho(liste:list, x:int) -> bool :
-        n = len(liste)
-        if n == 0:
-            return False 
-        elif n == 1:
-            return liste[0] == x
-        else:
-            t = n // 3
-            if x <= liste[t]:
-                return tricho(liste[0:t+1], x)
-            elif x > liste[2 * t]:
-                return tricho(liste[2*t + 1:n], x)
-            else:
-                return tricho(liste[t + 1: 2*t + 1], x)
-    \end{minted}
     
-    \item La complexité de la recherche par dichotomie est en $O(\ln n)$, mais plus particulièrement, dans le pire des cas, elle est en de $3\log(n)_2$ (le facteur $3$ vient du nombre de comparaison, et le $\log$ en base $2$ vient du fait que l'on divise la liste en deux à chaque fois). \\
-    \fbox{La complexité de la trichotomie est donc, dans le pire des cas, $4\log(n)_3$}. En notant $C_d$ et $C_t$ les complexités respectives des deux algorithmes de recherche, on a alors $$C_t = 4 \frac{\ln n}{\ln 3} = \frac{4}{3} \cdot \frac{\ln 2}{\ln 3} \cdot \frac{3\ln n}{\ln 2} = \frac{4}{3} \cdot \frac{\ln 2}{\ln 3} \cdot C_d \approx 0.84 \cdot C_d$$
-
-    Ainsi \fbox{$C_d \approx 1.2 C_t$, et la complexité asymptotique reste donc la même : $O(\ln(n))$}
-
-    \item \begin{minted}[breaklines, frame=single]{python}
-    def dicho_matrice(mat:list, x:int) -> tuple :
-        n = len(mat)
-        p = len(mat[0])
-        if n == 0 or p == 0:
-            return False
-        d_row, f_row = 0, n - 1
-        d_column, f_column = 0 , p - 1
-        while f_column - d_column > 0:
-            mid_column = (d_column + f_column) // 2
-            if x <= mat[n - 1][mid_column]:
-                f_column = mid_column
-            else:
-                d_column = mid_column + 1
-        while f_row - d_row > 0:
-            mid_row = (d_row + f_row) // 2
-            if x <= mat[mid_row][d_column]:
-                f_row = mid_row
-            else:
-                d_row = mid_row + 1
-        if mat[d_row][d_column] == x:
-            return (d_row, d_column)
-        else:
-            return (-1, -1)     
+        La complexité de \verb|distance| est également en $O(n)$, où $n$ est la
+        longueur des textes.
+    \item
+    \begin{minted}[breaklines, autogobble]{python3}
+        def aucun_caractere_commun(texte1, texte2):
+            occurence1, occurence2 = {}, {}
+            for i in range(len(texte1)):
+                if texte1[i] not in occurence:
+                    occurence1[texte[i]] = 1
+                else:
+                    occurence1[texte1[i]] += 1
+            for j in range(len(texte2)):
+                if texte2[j] not in occurence  
     \end{minted}
-\end{enumerate}
+\end{question}
 
-\section{Automates et langages de mots binaires}
+\section{Différentiels sur des positions variables}
 
-\begin{enumerate}
-    \setcounter{enumi}{10}
-
-    \item \begin{enumerate}
-        \item $\boxed{41 = \underline{1010001}_2}$
-        \item $\boxed{\underline{10101010}_2 = 88}$
-        \item \fbox{
-            \begin{minipage}[t]{0.8\textwidth}
-                Un automate est local lorsque pour chaque lettre $\sigma$, toutes les transitions étiquetées par $\sigma$ arrivent dans un même état. Un automate est dit standard lorsqu'il n'existe aucune transition aboutissant à l'état initial.
-            \end{minipage}}
-        \item \image{\centering}{0.3}{A1/A1.pdf}{Automate $\mathcal{A}_1$}
-        \item \begin{minted}[frame=single]{ocaml}
-    let langage_1 = function
-        |[] -> true
-        |h::_ -> h ;;
-    \end{minted}
-    \end{enumerate}
-
-    \item \begin{enumerate}
-        \item Avec $R = \{0, 1\}$, $S = \{0\}$, alors 
-        \begin{align*}
-            (RA^* \cap A^*S) \setminus (A^*\underbrace{\varnothing}_{\in A^2}A^*) &= (A^* \cap A^*S) \setminus \varnothing\\
-            &= A^*S \\
-            &= L_2 \\
-        \end{align*}
-        Donc \fbox{$L_2$ est bien un langage local}. 
-        \item \image{\centering}{0.3}{A2/A2.pdf}{Automate $\mathcal{A}_2$}
-        \item \begin{minted}[frame=single]{ocaml}
-    let rec langage_2 = function
-        |[] -> false
-        |h::[] -> not h
-        |_::t -> langage_2 t ;;
-        \end{minted}
-    \end{enumerate}
-
-    \item \begin{enumerate}
-        \item \image{\centering}{0.3}{A3/A3.pdf}{Automate $\mathcal{A}_3$}
-        \item \label{itm:multipleTrois} Montrons que $\mathscr{P}(n)$ est vrai pour tout $n \in \bb{N^*}$ : \\
-        \underline{Initialisation} : si $n = 1$, $\forall a \in A$, $\delta^*(0, a) = \delta(0, a) = (2 \cdot 0 + a) \mod 3 = (a \cdot 2^{1-1}) \mod 3$. \\
-        \underline{Hérédité} : Soit $n \in \bb{N^*}$, supposons $\mathscr{P}(n)$, montrons $\mathscr{P}(n) \implies \mathscr{P}(n + 1)$ : \\
-        Soit $m$ un mot de $A$ de taille $n + 1$, on peut écrire $m = w_1...w_{n + 1}$ où $\forall i \in \llbracket 1, n + 1 \rrbracket, \; w_i \in A$.
-        \begin{align*}
-            \text{Ainsi: } \delta^*(0, m) &= \delta^*(0, w_1...w_{n + 1}) &\\
-            &= \delta(\delta^*(0, w_2...w_{n + 1}), w_1) & \text{par définition de $\delta^*$}\\
-            &= 2 \left[ \left( \sum_{k = 2}^{n + 1} = w_k 2^{n - k} \right) \mod 3 \right] + w_1 \mod 3 & \text{par l'hypothèse de récurrence} \\
-            &= \sum_{k = 1}^{n + 1} = w_k 2^{n + 1 - k} \mod 3 & 
-        \end{align*}
-        Ainsi \fbox{on montre bien $\mathscr{P}(n)$ pour tout $n \in \bb{N^*}$}
-    \end{enumerate}
-
-    \item \begin{enumerate}
-        \item Le langage $L_1$ correspond à tous les entiers naturels en base 2.\\
-        Le langage $L_2$ correspond à tous les entiers naturels pairs en base 2. \\
-        La question \ref{itm:multipleTrois}. montre que $L_3$ correspond à tous les entiers naturels multiples de $3$ en base 2. \\
-        \fbox{
-            \begin{minipage}{0.83\textwidth}
-                Ainsi $L_4 = L_1 \cap L_2 \cap L_3$ correspond à tous les entiers naturels à la fois multiple de $2$ et $3$, c'est-à-dire à tous les entiers naturels multiples de $6$ en base 2.
-            \end{minipage}}
-
-        \item Les langages $L_1, \; L_2, \; L_3$ sont clairement reconnaissable (on a exhiber un automate les reconnaissant), donc, comme intersection de langages reconnaissables, $L_4$ est reconnaissable. \\
-        \fbox{D'où l'existence d'un automate reconnaissant $L_4$}.
-    \end{enumerate}
-\end{enumerate}
-
-\section{Diam\`etre d'un graphe}
-
-\subsection{Exemples de graphes}
-
-\begin{enumerate}
-    \setcounter{enumi}{14}
-
-    \item \encadrer{diam$(G_1) = 3$ ; chemins maximaux:$(0-2-3-4), (0-2-3-5), (1-2-3-4), \\ (1-2-3-5), (4-3-2-0), (5-3-2-0), (4-3-2-1), (5-3-2-1)$.} \\
-    \encadrer{diam$(G_2) = 3$ ; chemins maximaux : $(2-1-0-5), (1-0-5-4), (0-5-4-3), (5-4-3-2), \\ (4-3-2-1), (3-2-1-0), (0-1-2-3), (1-2-3-4), (2-3-4-5), (3-4-5-0), \\ (4-5-0-1), (5-0-1-2). $}
-
-    \item \begin{enumerate}
-        \item \image{\centering}{0.4}{diam_max/diam_max.pdf}{Graphe à $5$ sommets de diamètre maximum}
-        \item \begin{minted}[frame=single]{ocaml}
-    let diam_max n = (*cree un graphe "lineaire"*) 
-        let g = Array.make n [] in
-        if n > 1 then (g.(0) <- [1]; g.(n - 1) <- [n - 2]) ;
-        for i = 1 to n - 2 do
-            g.(i) <- [i + 1; i - 1]
-        done;
-        g ;;  
-        \end{minted}
-    \end{enumerate}
-    
-    \item \begin{enumerate}
-        \item \image{\centering}{0.4}{diam_min/diam_min.pdf}{Graphe à $5$ sommets de diamètre minimum}
-        \item \begin{minted}[frame=single]{ocaml}
-    let diam_min n = (*cree un graphe complet*)
-        let g = Array.make n [] in
-        for i = 0 to n - 1 do
-            for j = 0 to n - 1 do
-                if i <> j then g.(i) <- j::g.(i)
-            done;
-        done;
-        g ;;
-        \end{minted}
-    \end{enumerate}
-\end{enumerate}
-
-\subsection{Algorithmes de calcul du diam\`etre}
-
-\begin{enumerate}
-    \setcounter{enumi}{17}
-
-    \item \encadrer{L'algorithme de Dijkstra prend en entrée un graphe pondéré avec des poids positifs, et un sommet de départ. La sortie de l'algorithme est alors les plus courts chemins depuis le sommet de départ vers chacun des autre sommets du graphe.} \\
-    En pondérant toutes les arêtes avec des poids de $1$, et en appliquant l'algorithme de Dijkstra à chacun des sommets du graphe, on pourrait alors connaître le chemin le plus court de poids maximal, et \fbox{ce poids sera la diamètre du graphe}.
-
-    \item \label{itm:parcoursLargeur} \fbox{Le parcours en largeur} peut être utilisé pour calculer le diamètre d'un graphe, en effet en le faisant partir depuis chacun des sommets du graphe, alors on peut connaître toutes les distances, et donc la maximum.
-    
-    \item On note $n, p \in \bb{N}$ respectivement le nombre de sommets et d'arêtes du graphe alors la complexité de Djikstra est au mieux $O(n + p \log p)$ (elle dépend enfaite de la technique utilisé pour trouver un minimum dans un ensemble de poids). La complexité d'un parcours en largeur est quant à elle $O(n + p)$.
-    De plus dans les deux cas, on effectue l'algorithme en partant de chacun des sommets, soit $n$ fois. \\
-    \fbox{L'algorithme du parcours en largeur paraît donc plus adapté pour calculer le diamètre d'un graphe}.
-\end{enumerate}
-
-\subsection{Diam\`etre d'un arbre binaire}
-
-\begin{enumerate}
-    \setcounter{enumi}{20}
-    
-    \item \begin{minted}[frame=single]{ocaml}
-    let a = Noeud(0, 
-        Noeud(1,
-        (Noeud(2, 
-            Noeud(4, Feuille, Feuille), 
-            Feuille)), 
-        Noeud(3, 
-            Noeud(5, Feuille, Feuille),
-            Noeud(6, Feuille, Feuille))),
-    Feuille) ;; 
-    \end{minted}
-    \encadrer{diam$(\mathcal{A}) = 4$ ; chemins maximaux : $(4-2-1-3-6), (6-3-1-2-4), (4-2-1-3-5), (5-3-1-2-4)$}
-
-    \item Notons $\mathscr{P}(n)$ le prédicat : \og le graphe sous-jacent d'un arbre à $n$ sommets possède $n - 1$ arêtes \fg. Montrons que $\mathscr{P}(n)$ est vrai pour tout $n \in \bb{N^*}$ : \\
-    \underline{Initialisation} : si $n = 1$, alors le graphe sous-jacent est réduit à un unique sommet, et il possède $0 = n - 1$ arête. \\
-    \underline{Hérédité} : Soit $n \in \bb{N^*}$, supposons $\mathscr{P}(n)$, montrons $\mathscr{P}(n) \implies \mathscr{P}(n + 1)$ : \\
-    Soit $\mathcal{G}$ le graphe sous-jacent d'un arbre binaire à $n$ sommets. Le nombre d'arêtes de $\mathcal{G}$ est alors $n - 1$ (hypothèse de récurrence). \\ Ainsi, en adjoignant à $\mathcal{G}$ un nouveau sommet (on peut l'appeler $n$ sans perdre de généralité, quitte à renommer les sommets de $\mathcal{G}$), par définition d'un arbre binaire, il n'est relié qu'à un seul autre sommet. Ainsi $\mathcal{G} + \{n\}$ est le graphe sous-jacent d'un arbre binaire à $n + 1$ sommets et possède $n$ arêtes. \\
-    \fbox{Donc $r = n - 1$}
-
-    \item \begin{minted}[breaklines, frame=single]{ocaml}
-    let rec nb_noeuds = function
-        |Feuille -> 0
-        |Noeud(_, g, d) -> 1 + nb_noeuds g + nb_noeuds d ;;
-    \end{minted}
-
-    \vfill 
-
-    \item \begin{minted}[breaklines, frame=single]{ocaml}
-    let numerotation arbre =
-        let index = ref (-1) in 
-        let rec aux = function
-            |Feuille -> Feuille
-            |Noeud(_, g, d) -> (incr index ; 
-                                let i = !index in Noeud(i, aux g, aux d)) 
-        in
-        aux arbre ;;
-    \end{minted}
-
-    \item \begin{minted}[breaklines, frame=single]{ocaml}
-    let arbre_vers_graphe arbre =
-        let graphe = Array.make (nb_noeuds arbre) [] in
-        let rec aux sommet = function
-            |Feuille -> ()
-            |Noeud(a, g, d) -> if sommet <> -1 (*la racine n'a pas d'antecedant*)
-                                then begin 
-                                    graphe.(a) <- sommet::graphe.(a) ;
-                                    graphe.(sommet) <- a::graphe.(sommet)
-                                    end; 
-                                aux a g; 
-                                aux a d
-        in
-        aux (-1) arbre ;
-        graphe ;;
-    \end{minted}
-
-    \item \cprotect\encadrer{On peut calculer le diamètre d'un arbre en le transformant en graphe et effectuant des parcours en largeur commme énoncé à la question \ref{itm:parcoursLargeur}. Si l'arbre n'est pas correctement numeroté, on peut utilisé \verb|numerotation|.} \\
-    Soit $n$ le nombre de noeuds d'un arbre. La complexité de \verb|nb_noeuds| est $O(n)$, celle de numerotation est aussi $O(n)$. Enfin le parcours en largeur effectué $n$ fois a pour complexité $O(n(n + n - 1 )) = O(n^2)$. \fbox{La complexité totale de l'algorithme est donc $O(n^2)$}
-
-    \item Soit $\mathcal{A}$ un arbre binaire, si $\mathcal{A}$ est vide ou réduit à une feuille, alors il n'existe pas de chemin (grahe sous-jacent vide). Sinon on note $\mathcal{A}= (r, \mathcal{A}_g, \mathcal{A}_d)$. On pose $h(\text{Feuille}) = - 1$ La longueur maximal d'un chemin passant par la racine est alors :
-    \[
-        \boxed{\underbrace{1 + 1}_{\text{distance pour aller à $\mathcal{A}_g$ et $\mathcal{A}_d$}} + \overbrace{ h(\mathcal{A}_g) + h(\mathcal{A}_d) }^{\text{par definition de $h$}}}
-    \]
-
-    \item \begin{minted}[breaklines, frame=single]{ocaml}
-    let rec diam_arbre arbre = 
-        let rec aux = function (*renvoie diametre, hauteur*)
-        |Feuille -> (0, -1) (*on pose diam(Feuille) = 0 pour des raisons de cohérence*)
-        |Noeud(_, g, d) -> let diam_g, haut_g = aux g in
-                           let diam_d, haut_d = aux d in
-                           let max_hauteur = 1 + max haut_g haut_d in
-                           let chemin_racine = 2 + haut_g + haut_d in
-                           let max_diam_fils = max diam_g diam_d in
-                           (max chemin_racine max_diam_fils), max_hauteur
-        in
-        fst (aux arbre) ;;
-    \end{minted}
-    Récursivement, la fonction \verb|aux| ne parcourt bien qu'une seule fois chacun des noeuds. \\
-    \cprotect\fbox{La complexité de \verb|diam_arbre| est donc bien linéaire en le nombre de noeuds de l'arbre}.
-\end{enumerate}
-
-
-\null
-\begin{center}
-        F\footnotesize{IN DE LA COPIE}
-    \end{center}
+\begin{question}
+    \item
+\end{question}
 
 \end{document}

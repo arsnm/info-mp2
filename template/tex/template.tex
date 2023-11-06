@@ -44,6 +44,18 @@
 {\Large\bfseries}
 {\thesection}{1em}{\ul{#1}}
 
+% personalized 'question' list (mainly for test)
+\newlist{question}{enumerate}{2}
+\setlist[question, 1]
+{label=\bfseries{Q\arabic{questioni}.},
+leftmargin=5em,
+resume
+}
+\setlist[question, 2]
+{label=(\alph{questionii}),
+leftmargin=\parindent
+}
+
 % math commands
 \newcommand{\bb}[1]{\mathbb{#1}}
 
@@ -76,12 +88,13 @@
 
 %------------------------------------------------------------------------------
 
+% DOCUMENT
 % document info
 \makeatletter
 \title{Title}
 \date{\today}
-\newcommand{\matiere}{Class}
-\newcommand{\classe}{MP\textsuperscript{*} }
+\newcommand{\matiere}{Course}
+\newcommand{\classe}{Class}
 \author{First/Last Name}
 
 % header
@@ -94,6 +107,9 @@
 
 \begin{document}
 
+% personalized list style
+
+
 \thispagestyle{firstpage}
 
 \begin{center}
@@ -102,16 +118,28 @@
 
 \section{Problem 1}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non viverra 
+\begin{question}
+\item Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non viverra 
 eros, et gravida lorem. Maecenas vel varius neque. Aliquam.
+\end{question}
 
 \section{Problem 2}
 
-Code example : 
-\begin{minted}[breaklines]{ocaml}
+\begin{question}
+\item \begin{question}
+    \item Code example : 
+        \begin{minted}[breaklines]{ocaml}
     type t = {name : string ; mutable info : int};
     let p = { name = "John"; info = 23 };;
     let double_quote = ""
     let broken_highlight = ()
-\end{minted}
+        \end{minted}
+    \item The complexity of the code is $O(1)$
+    \end{question}
+
+    \item \begin{question}
+        \item Let $n \in \bb{N}$ ...
+    \end{question}
+\end{question}
+
 \end{document}
