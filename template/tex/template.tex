@@ -30,21 +30,13 @@
 %------------------------------------------------------------------------------
 
 % COMMANDS AND PERSONALIZATION
-% references for items in 'enumerate'
-\makeatletter
-\def\namedlabel#1#2{\begingroup
-    #2%
-    \def\@currentlabel{#2}%
-    \phantomsection\label{#1}\endgroup
-}
-\makeatother
 
 % personalized section style
 \titleformat{\section}
 {\Large\bfseries}
 {\thesection}{1em}{\ul{#1}}
 
-% personalized 'question' list (mainly for test)
+% personalized 'question' list (mainly for test sheet)
 \newlist{question}{enumerate}{2}
 \setlist[question, 1]
 {label=\bfseries{Q\arabic{questioni}.},
@@ -67,6 +59,8 @@ leftmargin=\parindent
 }}
 
 % \renewcommand{\thesection}{\Roman{section}} % Roman numerals for sections
+%\renewcommand{\thesubsection}{\thesection.\Alph{subsection} -} %  Alphabetical
+% numerals for subsections
 \setlength{\headheight}{12.5pt}
 
 \graphicspath{ {./img/} } % define path to img 
