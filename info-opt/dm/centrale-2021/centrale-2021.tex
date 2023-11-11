@@ -20,7 +20,7 @@
 \usepackage{enumitem, hyperref}
 
 % math notation
-\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{amsmath, amsfonts, amssymb, mathrsfs}
 \usepackage{stmaryrd}
 
 % code formatting
@@ -138,9 +138,9 @@ let g_2_3 = [|
     \item \begin{minted}[breaklines]{ocaml}
 let adjacence g =
     let n = Array.length g in
-    let adj = Array.make_matrix n n 0 in
+    let adj = Array.make n [||] in
     for i = 0 to n - 1 do
-    List.iter (fun x -> adj.(i).(x) <- 1) g.(i) 
+        adj.(i) <- Array.of_list g.(i)
     done;
     adj ;; 
     \end{minted}
@@ -216,7 +216,7 @@ let quadrillage p q =
     \end{itemize}
 
     Ainsi comme les composantes connexes de $G$ sont les classes d'équivalence
-    de $\ast$ et forment donc une partition de $S_n$.
+    de $\ast$, elles forment une partition de $S_n$.
 
     \item Soit $s, t$ deux sommets tels que $s \ast t$, en notant $len(c)$ la
     longueur d'un chemin $c$, \\ alors 
@@ -264,6 +264,246 @@ let quadrillage p q =
 
     \item D'après \ref{itm:Q9}, $(i) \implies (ii)$ et $(i) \implies (iii)$
     
+    Si $(ii)$, notons 
+    $\mathcal{H} = \{ H \mid H = (S_n, B), B \subset A \text{ et H connexe}\}$,
+
+    Comme $G \in \mathcal{H}$, alors $\mathcal{H}$ non vide, en particulier,
+    l'ensemble des cardinaux des aretes est une partie non-vide de $\bb{N}$, on 
+    peut donc considérer $H = (S_n, B)$ avec $B$ de cardinal minimal. 
+
+    Supposons par l'absurde que $H$ possède un cycle, alors en supprimant une
+    arete quelconque de ce cycle, $H$ reste connexe et possède $|B| - 1 < |B|$
+    aretes $\rightarrow$ absurde car $B$ est de cardinal minimal. Donc $H$ est
+    acyclique et finalement $H$ est un arbre, d'où $|B| = n - 1$
+    (d'après \ref{itm:Q9}) et donc finalement $H = G$.
+
+    Ainsi $G$ est un arbre donc $(ii) \implies (i)$
+
+    \vspace{1em}
+
+    Si $(iii)$, notons de même
+    $\mathcal{H} = \{H \mid H = (S_n, B),A \subset B \text{ et H acyclique}\}$,
+
+    Comme $G \in \mathcal{H}$, alors $\mathcal{H}$ non vide, alors on peut
+    de même considérer $H = (S_n, B)$ de avec $|B|$ minimal.
+
+    Supposons par l'absurde que $H$ ne soit pas connexe, alors il existe $C_1,
+    \hdots, C_p$ ($p \geqslant 2$) composantes connexes de $H$. Notons $n_i$
+    et $m_i$ le nombres de sommets et d'aretes de $C_i$. Alors comme les $C_i$
+    sont connexes et acycliques, ce sont des arbres, donc possèdent $m_i = n_i
+    - 1$ aretes d'après \ref{itm:Q9}.
+
+    Donc $|B| = \sum_{k=1}^{p} m_k = \sum_{k=1}^{p} n_i - 1 = n - p < n - 1$
+    $\rightarrow$ absurde car $|B| \geqslant n - 1$. Donc finalement $H$ est
+    connexe et acyclique, donc est un arbre, donc possède $|B| = n - 1$ aretes.
+
+    Donc finalement $H = G$ et donc $G$ est un arbre, d'où $(iii) \implies (i)$
+    
+    \item \begin{minted}[breaklines]{ocaml}
+let rec representant partition sommet =
+    if partition.(sommet) < 0 then sommet
+    else representant partition partition.(sommet)
+    \end{minted}
+
+    \item \begin{minted}[breaklines]{ocaml}
+let union partition sommet1 sommet2 =
+    let h_sommet1 = - partition.(sommet1) - 1 in
+    let h_sommet2 = - partition.(sommet2) - 1 in
+    if h_sommet1 > h_sommet2 then
+        partition.(sommet2) <- sommet1
+    else if h_sommet1 = h_sommet2 then
+        begin
+        partition.(sommet1) <- sommet2 ;
+        partition.(sommet2) <- partition.(sommet2) - 1 
+        end
+    else
+        partition.(sommet1) <- sommet2 ;;
+    \end{minted}
+
+    \item \label{itm:Q13} Montrons le résultat sur $k$ le nombre de réunions 
+    réalisés:
+    
+    Notons $H_k$ : "Après $k$ réunions, si $s$ représentant de 
+    $X \in \mathscr{P}$, alors $|X| \geq 2^{h(s)}$"
+    \begin{itemize}
+        \item Si $k = 0$, alors $\mathscr{P} = \mathscr{P}^{(0)}_n$, donc
+        si $X \in \mathscr{P}$, $X = \{s\}$ et $h(s) = 0$ ainsi 
+        $|X| = 1 \geq 2^{h(s)}$, d 'où ${H}_0$
+
+        \item Soit $k \in \bb{N}^*$, supposons $H_{k - 1}$, montrons $H_k$.
+        
+        Si $\mathscr{P} = \{X_1, \hdots, X_p\}$ une partition ayant subi $k-1$
+        réunions depuis $\mathscr{P}^{(0)}_n$.
+
+        Soit $\mathscr{P}'$ ayant subi une réunion depuis $\mathscr{P}$.
+        Notons $\mathscr{P}' = \{X_1', \hdots, X_{p - 1}'\}$.
+
+        \vspace{1em}
+
+        Soit $i \in \llbracket 0, p \llbracket$, alors si $X_i'$ n'a pas subi
+        de réunion, alors il existe $j$ tel que $X_i' = X_j$ et donc si $s$ est 
+        un représentant de $X_i'$, alors $h'(s) = h(s)$ et donc $|X_i'| = |X_j|
+        \geqslant 2^{h(s)} = 2^{h'(s)}$.
+
+        \vspace{1em}
+
+        Sinon, $X_i'$ a subi une réunion et donc il existe $j \neq m$ tels que
+        $X_i' = X_j \cup X_m$.
+
+        Notons $s, s_j, s_m$ les représentants respectifs de $X_i', X_j, X_m$.
+        Lors de la réunion, la hauteur de $s$ ne peut qu'augmenter de $1$, donc
+        $h'(s) \leqslant 1 + h(s_j)$ et $h'(s) \leqslant 1 + h(s_m)$.
+
+        Donc, $\mathscr{P}$ étant une partition, $X_j \cap X_m = \varnothing$
+        et donc, 
+        \begin{align*}
+            |X_i'| &= |X_j| + |X_m| \\
+                   &\geqslant 2^{h(s_j)} + 2^{h(s_m)} \\
+                   &\geqslant 2^{h(s) - 1} + 2^{h(s) - 1} \\
+                   &= 2^{h(s)}
+        \end{align*}
+
+        D'où $H_k$, et donc le résultat.
+    \end{itemize}
+
+    \item Si $\mathscr{P}$ est une partition construite depuis 
+    $\mathscr{P}^{(0)}_n$, alors dans le pire des cas, trouver le représentant
+    $s$ de $x \in S_n$ se fait en $h(s)$ appels récursifs. Or d'après 
+    \ref{itm:Q13}, $h(s) \leqslant \log_2 |X|$, et $|X| \leqslant n$ (dans le
+    pire des cas c'est une égalité). Donc la complexité de représentant est
+    $\mathcal{O}(\log_2 n$)
+
+    La fonction union ne fait que des opérations élémentaires sur des 
+    \verb|array| donc est en $\mathcal{O}(1)$
+
+    \item Pour vérifier que $G$ est un arbre, on vérifie qu'il possède $n - 1$ 
+    aretes et qu'il est connexe.
+    
+    \begin{minted}[breaklines]{ocaml}
+let count_composantes_connexes  graphe =
+    let n = Array.length graphe in
+    let count =  ref 0 in
+    let partition = Array.make n (-1) in
+    for sommet1 = 0 to n - 1 do
+        List.iter (fun sommet2 ->
+                let representant_sommet1 = representant partition sommet1 in
+                let representant_sommet2 = representant partition sommet2 in
+                if representant_sommet1 <> representant_sommet2 then
+                    union partition representant_sommet1 representant_sommet2)
+                graphe.(sommet1)
+    done;
+    for sommet = 0 to n - 1 do
+        if partition.(sommet) < 0
+            then incr count
+    done;
+    !count ;;
+
+let est_arbre graphe =
+    let n = Array.length graphe in
+    (nombre_aretes graphe = n - 1) && (count_composantes_connexes graphe = 1)
+    \end{minted}
+
+    \item Il correspond au chemin $1-2-5-4$
+
+    \item L'algorithme ne termine pas toujours, en effet si $G = G_{3,2}$ et
+    $\mathcal{T} = (\{0\}, \varnothing)$, alors si $s = 5$, il se peut que
+    l'algorithme fasse le chemin $1-2-6-5$ en boucle, le choix étant aléatoire,
+    et donc l'extrémité d'un tel chemin ne se trouvera jamais dans 
+    $\mathcal{T}$.
+
+    \item \begin{minted}[breaklines]{ocaml}
+let marche_aleatoire adj parent sommet =
+    let chemin = {debut = sommet ; fin = sommet ; 
+    suivant = Array.make (Array.length adj) 0} in
+    while parent.(chemin.fin) = -2 do
+        begin
+        let nombre_voisins = Array.length adj.(chemin.fin) in
+        let indice_voisin_aleatoire = Random.int nombre_voisins in
+        let voisin_aleatoire = adj.(chemin.fin).(indice_voisin_aleatoire) in
+        chemin.suivant.(chemin.fin) <- voisin_aleatoire; (*si u est dans le cycle, 
+           cette modification n'importe pas*)
+        chemin.fin <- voisin_aleatoire;
+        end
+    done;
+    chemin ;;
+    \end{minted}
+
+    \item \begin{minted}[breaklines]{ocaml}
+let greffe parent chemin =
+    let sommet = ref chemin.debut in
+    while !sommet <> chemin.fin do (*chemin.fin etant dans T, on a pas à l'ajouté*)
+        let suivant = chemin.suivant.(!sommet) in
+        parent.(!sommet) <- suivant;
+        sommet := suivant
+    done;
+    \end{minted}
+
+    \item \begin{minted}[breaklines]{ocaml}
+let wilson g r =
+    let n = Array.length g in
+    let adj = adjacence g in
+    let parent = Array.make n (-2) in
+    parent.(r) <- -1 ;
+    for sommet = 0 to n - 1 do
+        if parent.(sommet) < 0 then
+            let chemin = marche_aleatoire adj parent sommet in
+            greffe parent chemin
+    done;
+    parent ;;
+    \end{minted}
+
+    \item \image{\centering}{0.5}{q21}
+    
+    \item \image{\centering}{0.4}{q22}
+    
+    \item Si $s$ un sommet de $\mathcal{T}$, alors les coordonnées de $s$ 
+    dans $G_{p, q}$ sont $(i = \lfloor s / p \rfloor, j = s \mod p)$. 
+
+    Comme $G_{p, q}$ ne garde que les cases noires, les coordonnées 
+    correspondantes dans $E_{p, q}$ sont $(2i, 2j)$. 
+    
+    Ainsi en fonction de la direction du domino dans la case noire $(2i, 2j)$,
+    on obtient les coordonnées de $s'$, le père de $s$ :
+    \begin{itemize}
+        \item Si la direction est OUEST, alors $s' = ip + (j - 1)$
+        \item Si la direction est NORD, alors $s' = (i + 1)p + j$
+        \item Si la direction est SUD, alors $s' = (i- 1)p + j$
+        \item Si la direction est EST, alors $s' = ip + (j + 1)$
+    \end{itemize}
+
+    \item \begin{minted}[breaklines]{ocaml}
+let coord_noire sommet = 
+    let i, j = sommet / p, sommet mod p in
+    (i * 2, j * 2) 
+    \end{minted}
+
+    \item \begin{minted}[breaklines]{ocaml}
+let sommet_direction sommet direction =
+    let i, j = sommet / p, sommet mod p in
+    match direction with
+    |N -> if i >= (q - 1) then -1 else (i + 1) * p + j
+    |S -> if i <= 0 then -1 else (i - 1) * p + j
+    |W -> if j <= 0 then -1 else i * p + j - 1
+    |E -> if j >= (p - 1) then -1 else i * p + j + 1       
+    \end{minted}
+
+    \item \begin{minted}[breaklines]{ocaml}
+let phi pavage = 
+    let parent = Array.make (p * q) (-2) in
+    parent.(0) <- -1;
+    for i = 0 to q - 1 do
+        for j = 0 to p - 1 do
+            let sommet = i * p + j in
+            let x_pavage, y_pavage = coord_noire sommet in
+            if x_pavage mod 2 = y_pavage mod 2
+                && (x_pavage, y_pavage) <> (0, 0) then
+                let pere = sommet_direction sommet 
+                                  pavage.(x_pavage).(y_pavage) in
+                parent.(sommet) <- pere
+          done;
+    done;
+    parent ;;       
+    \end{minted}
 \end{question}
 
 \end{document}
