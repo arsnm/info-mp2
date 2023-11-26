@@ -7,7 +7,7 @@ df = pd.read_csv("titanic.csv")
 def moyenne(df, c):
     sum = 0
     for i in df.index:
-        sum += df[i, c]
+        sum += df.loc[i, c]
     return sum / len(df)
 
 
@@ -15,8 +15,8 @@ def ecart_type(df, c):
     avg = moyenne(df, c)
     sum = 0
     for i in df.index:
-        sum += (df[i, c] - avg) ** 2
-    return (1 / len(df) * sum) ** (1 / 2)
+        sum += (df.loc[i, c] - avg) ** 2
+    return (sum / len(df)) ** (1 / 2)
 
 
 def survivants(col, val):
@@ -29,11 +29,11 @@ def survivants(col, val):
     return n_survivants / n
 
 
-# for c, v in [("Sex", "male"), ("Sex", "female"), ("Pclass", 1), ("Pclass", 3)]:
-#      print("Taux de survie pour", c, "=", v, ":", survivants(c, v))
+for c, v in [("Sex", "male"), ("Sex", "female"), ("Pclass", 1), ("Pclass", 3)]:
+    print("Taux de survie pour", c, "=", v, ":", survivants(c, v))
 
 # remplace male par 0 et female par 1
-df["Sex"] = df["Sex"].map({"male": 0, "female": 1})
+df["Sex"] = df["Sex"].replace({"male": 0, "female": 1})
 
 
 def standardiser(df, c):
@@ -52,39 +52,39 @@ def distance(p1, p2):
     return sum ** (1 / 2)
 
 
-train = df.sample(frac=0.9, random_state=0)
-test = df.drop(train.index)
+train = df.sample(frac=0.8, random_state=0)
+test = df.drop(index=list(train.index))
 # print("nombre de données dans train :", len(train))
 # print("nombre de données dans test :", len(test))
 
 
 def voisins(x, k):
     indices = sorted(train.index, key=lambda i: distance(x, train.loc[i]))
-    return indices[k:]
+    return indices[:k]
 
 
 def plus_frequent(list_elements):
     count = {}
     for element in list_elements:
-        if element in count:
-            count[element] += 1
-        else:
-            count[element] = 1
+        count[element] = count.get(element, 0) + 1
     return max(count, key=lambda element: count[element])
 
 
 def knn(x, k):
-    return plus_frequent(train.loc[i, "Survived"] for i in voisins(x, k))
+    nearest_neighbors = voisins(x, k)
+    return plus_frequent(train.loc[i, "Survived"] for i in nearest_neighbors)
 
 
 def precision(k):
     success = 0
     for i in test.index:
         knn_result = knn(test.loc[i], k)
-        print(knn_result)
         if knn_result == test.loc[i, "Survived"]:
             success += 1
     return success / len(test)
+
+
+print(precision(46))
 
 
 def plot_precision(kmax):
@@ -92,10 +92,10 @@ def plot_precision(kmax):
     y = []
     for k in x:
         p = precision(k)
+        print(p)
         y.append(p)
     plt.plot(x, y)
     plt.show()
 
 
-print(precision(46))
-plot_precision(11)
+plot_precision(10)
