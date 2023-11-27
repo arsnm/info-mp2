@@ -60,7 +60,7 @@ test = df.drop(train.index)
 
 def voisins(x, k):
     indices = sorted(train.index, key=lambda i: distance(x, train.loc[i]))
-    return indices[k:]
+    return indices[:k]
 
 
 def plus_frequent(list_elements):
@@ -81,7 +81,6 @@ def precision(k):
     success = 0
     for i in test.index:
         knn_result = knn(test.loc[i], k)
-        print(knn_result)
         if knn_result == test.loc[i, "Survived"]:
             success += 1
     return success / len(test)
