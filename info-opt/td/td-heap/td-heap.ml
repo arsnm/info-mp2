@@ -75,17 +75,17 @@ let rec decode tree list =
 ;;
 
 let to_huffman freq =
-    let fp = pq_create () in
+    let pq = pq_create () in
     let rec fill freq=
       match freq with
       |[] -> ()
-      |(f, chr)::t -> pq_add fp (f, F(chr)) ; fill t in
+      |(f, chr)::t -> pq_add pq (f, F(chr)) ; fill t in
     fill freq;
-    while len_over_2 fp do
-      let (f1, a1), (f2, a2) = pq_extract_min fp, pq_extract_min fp in
-        pq_add fp (f1 + f2, N(a1, a2))
+    while len_over_2 pq do
+      let (f1, a1), (f2, a2) = pq_extract_min pq, pq_extract_min pq in
+        pq_add pq (f1 + f2, N(a1, a2))
     done;
-    snd (pq_extract_min fp)
+    snd (pq_extract_min pq)
 ;;
 
 let to_dict arb = 
@@ -98,8 +98,8 @@ let to_dict arb =
   aux arb dict [] ; dict
 ;;
 
-let rec code lst dict =
-    match lst with
+let rec code list dict =
+    match list with
     |[] -> []
     |h::t -> (Hashtbl.find dict h) @ code t dict
 ;;

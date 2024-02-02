@@ -1,0 +1,190 @@
+\documentclass{article}
+
+% PACKAGES
+% essentials
+\usepackage[french, english]{babel} % specific language formatting
+\usepackage[T1]{fontenc} % characters encoding
+\usepackage{caption} % captions for graphics, images, ...
+
+% page formatting
+\usepackage[a4paper, portrait, margin=20mm]{geometry} % define the page format
+\usepackage[explicit]{titlesec} % formatting and styling of section titles ... 
+% ... and headers
+\usepackage{fancyhdr} % customize headers and footers
+\usepackage{lastpage} % keeps track of the number of last page
+\usepackage{graphicx} % image, figures and graphics insertion
+\usepackage[ddmmyyyy]{datetime} % display the date and time of saving
+\usepackage{adjustbox} % scaling, resizing graphics
+\usepackage{color, soul} % text formatting (highlight, underline, ...)
+\setulcolor{red}
+\usepackage{enumitem, hyperref}
+
+% math notation
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{stmaryrd}
+
+% code formatting
+\usepackage[outputdir=.aux]{minted}
+\usemintedstyle{emacs}
+
+%------------------------------------------------------------------------------
+
+% COMMANDS AND PERSONALIZATION
+
+% personalized section style
+\titleformat{\section}
+{\Large\bfseries}
+{\thesection}{1em}{\ul{#1}}
+
+% personalized 'question' list (mainly for test sheet)
+\newlist{question}{enumerate}{2}
+\setlist[question, 1]
+{label=\bfseries{\arabic{questioni}.},
+leftmargin=5em,
+% resume
+}
+\setlist[question, 2]
+{label=(\alph{questionii}),
+leftmargin=\parindent
+}
+
+% math commands
+\newcommand{\bb}[1]{\mathbb{#1}}
+
+% framing text
+\newcommand{\encadrer}[1]{\fbox{color=red
+    \begin{minipage}{0.90\textwidth}
+        #1
+    \end{minipage}
+}}
+
+\renewcommand{\thesection}{\Roman{section}} % Roman numerals for sections
+%\renewcommand{\thesubsection}{\thesection.\Alph{subsection} -} %  Alphabetical
+% numerals for subsections
+\setlength{\headheight}{12.5pt}
+
+\graphicspath{ {./img/} } % define path to img 
+
+% insert image command
+\newcommand{\image}[3]{
+    \begin{minipage}[t]{\linewidth}
+        #1
+        \adjustbox{valign=t}{
+            \includegraphics[width=#2\linewidth]{#3}
+        }
+    \end{minipage}}
+
+% page numbering
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[R]{\thepage/\pageref{LastPage}}
+
+%------------------------------------------------------------------------------
+
+% DOCUMENT
+% document info
+\makeatletter
+\title{TD - Langages Rationnels}
+\date{\today}
+\newcommand{\matiere}{Informatique Option}
+\newcommand{\classe}{MP*}
+\author{Arsène MALLET}
+
+% header
+\fancypagestyle{firstpage}{
+    \fancyhead[L]{\@author}
+    \fancyhead[C]{\classe - \matiere}
+    \fancyhead[R]{\@date}
+}
+
+
+\begin{document}
+
+% personalized list style
+
+
+\thispagestyle{firstpage}
+
+\begin{center}
+    \huge\bfseries{\@title}
+\end{center}
+
+\section{Règles Opératives}
+
+\begin{question}
+    \item Vrai.
+
+    \item Faux : $e_1e_2 \in (e_1 | e_2)^*$ mais $e_1e_2 \notin e_1^* | e_2^*$
+
+    \item Faux : $e_1e_1 \notin (e_1 e_2)^*$ mais $e_1e_1 \in e_1^* e_2^*$
+
+    \item Vrai.
+\end{question}
+
+\section{Petites Questions}
+
+\begin{question}
+
+    \item $(c^*ac^*bcˆ* | c^*bc^*ac^*)$
+    \item Ce langage corresond à $1(0|1)^*0^2 | 0$
+    \item $(a(b | c) | b | c)^*(a | \varepsilon)$
+    \item $(bc | b)^*a(bc | b)^*a(bc | b)^*$
+    \item \begin{itemize}
+        \item $L(\frac{1}{6}) = \varepsilon | 16^*$
+        \item $L(\frac{1}{7}) = (142857)^*(\varepsilon | 1 | 14 | 142 | 1428 | 14285)$
+    \end{itemize}
+    \item TODO
+
+\end{question}
+ 
+\section{Distance de Hamming}
+
+\begin{question}
+
+    \item \begin{itemize}
+        \item $\forall u, v \in \Sigma,\; d(u, v) \geqslant 0$
+        \item $\forall u, v \in \Sigma,\; d(u, v) = 0 \implies u = v$
+        \item $\forall u, v, w \in \Sigma,\; d(u, v) \leqslant d(u, w) + d(w, v)$
+    \end{itemize}
+Ainsi la distance de Hamming est bien une distance.
+
+    \item
+    $\mathcal{H}(L(0^*1^*)) = (0^*(1 | \varepsilon)0^*) | (0^*1^*(0 | \varepsilon)1^*)$
+
+    \item 
+
+    \item \begin{minted}{ocaml}
+let rec voisinnage = function 
+    |Vide -> Vide
+    |Epsilon -> Epsilon
+    |L(a) -> L(1 - a)
+    |Union(e1, e2) -> Union(voisinnage e1, voisinnage e2)
+    |Concat(e1, e2) -> Union(Concat(voisinnage e1, e2), Concat(e1, voisinnage e2))
+    |Etoile(e) -> Concat(Etoile(e), Concat(voisinnage e, Etoile(e)))
+    \end{minted}
+
+\end{question}
+
+\section{Hauteur d'étoile}
+
+\begin{question}
+
+    \item \begin{align*}
+        h((ba^*b)^*) &= 1 + h(ba^*b) \\
+                     &= 1 + max(h(b), h(a^*b)) \\
+                     &= 1 + max(0, max(h(a^*), h(b))) \\
+                     &= 1 + max(1 + h(a), 0) \\
+                     &= 1 + 1 = 2 \\
+    \end{align*}
+
+    \item \begin{minted}{ocaml}
+let rec hauteur = function
+    |Vide |Epsilon |L(_) -> 0
+    |Union(e1, e2) |Concat(e1, e2) -> max (hauteur e1) (hauteur e2)
+    |Etoile(e) -> 1 + hauteur e
+    \end{minted}
+
+    \item Ce sont des langages finies
+\end{question}
+\end{document}
